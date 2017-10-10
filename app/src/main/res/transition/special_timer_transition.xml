@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
+    android:transitionOrdering="together"
+    android:interpolator="@android:interpolator/decelerate_cubic">
+
+    <fade android:fadingMode="fade_in"
+          android:interpolator="@android:interpolator/accelerate_quint"
+        android:duration="@integer/timer_animation_duration">
+        <targets>
+            <target android:targetId="@id/special_timer_view"/>
+            <target android:targetId="@id/special_timer_background"/>
+        </targets>
+    </fade>
+
+    <changeBounds android:duration="@integer/timer_animation_duration"/>
+
+    <transition class="ru.stage_sword.transitions.ReflowText" android:duration="@integer/timer_animation_duration"/>
+
+</transitionSet>

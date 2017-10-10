@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
+               android:transitionOrdering="together"
+               android:interpolator="@android:interpolator/decelerate_cubic">
+
+    <changeBounds android:duration="@integer/timer_animation_duration"/>
+
+    <transition class="ru.stage_sword.transitions.ReflowText" android:duration="@integer/timer_animation_duration"/>
+
+    <fade android:fadingMode="fade_out"
+          android:interpolator="@android:interpolator/decelerate_quint"
+          android:duration="@integer/timer_animation_duration">
+        <targets>
+            <target android:targetId="@id/discipline_selector"/>
+            <target android:targetId="@id/button_start_again"/>
+            <target android:targetId="@id/special_timer_background"/>
+            <target android:targetId="@id/special_timer_view"/>
+        </targets>
+    </fade>
+
+</transitionSet>

@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">FAF stopwatch</string>
+
+    <string name="start_stop_button">Start/Stop</string>
+    <string name="timer_content" translatable="false">0:00.00</string>
+    <string name="total_time_title">Total time</string>
+    <string name="special_time_title">Overall fencing time</string>
+    <string name="solo_label">Solo</string>
+    <string name="synchron_label">Synchron</string>
+    <string name="duet_label">Duet</string>
+    <string name="group_label">Group</string>
+    <string name="button_start_again_text">Start again</string>
+    <string name="action_settings">Settings</string>
+</resources>

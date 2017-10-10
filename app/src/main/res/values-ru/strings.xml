@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Секундомер ФАФ</string>
+    <string name="start_stop_button">Старт/Стоп</string>
+    <string name="total_time_title">Общее время выступления</string>
+    <string name="special_time_title">Время фехтования</string>
+    <string name="solo_label">Упражнение \"Соло\"</string>
+    <string name="synchron_label">Упражнение \"Группа\"</string>
+    <string name="duet_label">Дуэт</string>
+    <string name="group_label">Группа</string>
+    <string name="button_start_again_text">Начать заново</string>
+    <string name="action_settings">Настройки</string>
+</resources>

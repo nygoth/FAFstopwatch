@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionManager xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <transition android:toScene="@layout/special_timer_scene"
+                android:transition="@transition/special_timer_transition"/>
+
+    <transition android:toScene="@layout/final_results_scene"
+                android:transition="@transition/results_transition"/>
+
+    <transition android:toScene="@layout/total_timer_scene"
+                android:transition="@transition/total_timer_transition"/>
+
+</transitionManager>

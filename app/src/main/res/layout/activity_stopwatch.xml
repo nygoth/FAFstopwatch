@@ -1,0 +1,41 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+              android:orientation="vertical"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             tools:context="ru.stage_sword.fafstopwatch.StopwatchActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:titleTextColor="?attr/colorControlNormal"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <FrameLayout
+            android:id="@+id/timer_scene_root"
+            android:background="@color/scene_root_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/touchpad"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:longClickable="true"
+            android:fitsSystemWindows="true">
+        </FrameLayout>
+    </FrameLayout>
+
+</LinearLayout>
+
+
