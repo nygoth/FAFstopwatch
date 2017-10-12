@@ -10,6 +10,8 @@ import android.os.SystemClock;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
 
+import java.lang.ref.WeakReference;
+
 
 /**
  * Created by nygoth on 22.09.2017.
@@ -91,6 +93,7 @@ import android.util.AttributeSet;
  * процессе считывания и будут актуальны до тех пор, пока секундомер не разморозят.
  */
 
+@SuppressWarnings("unused")
 public class PrecisionChronometer extends AppCompatTextView {
     @SuppressWarnings("unused")
     private static final String TAG = "PrecisionChronometer";
@@ -200,6 +203,34 @@ public class PrecisionChronometer extends AppCompatTextView {
         void OnUnpause(PrecisionChronometer chronometer);
     }
 
+    private static class innerHandler extends Handler {
+        private final WeakReference<PrecisionChronometer> m_pHandlerHolder;
+
+        innerHandler(PrecisionChronometer holder) {
+            m_pHandlerHolder = new WeakReference<>(holder);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            PrecisionChronometer holder = m_pHandlerHolder.get();
+            if (holder != null) {
+                if (!holder.isRunning()) return;
+
+                switch (msg.what) {
+                    case TICK_MESSAGE:
+                        holder.updateText(SystemClock.elapsedRealtime());
+                        holder.dispatchTick();
+                        sendMessageDelayed(Message.obtain(this, TICK_MESSAGE), 97);
+
+                        break;
+                    case DELAYED_HOLD_MESSAGE:
+                        holder.hold();
+                        break;
+                }
+            }
+        }
+    }
+
     /*
      * Ключи для сохранения и восстановления состояния
      */
@@ -214,6 +245,8 @@ public class PrecisionChronometer extends AppCompatTextView {
     private static final String STATE_VALUE_STOP_DELAY  = "stop_delay";
     private static final String STATE_VALUE_DELAY_TYPE  = "delay_type";
     private static final String STATE_VALUE_SUPERSTATE  = "super_state";
+
+    private final Handler mHandler = new innerHandler(this);
 
     /*
      * Переменные, определяющие тип и состояние секундомера
@@ -270,6 +303,7 @@ public class PrecisionChronometer extends AppCompatTextView {
             updateText(m_aBase);
         }
     }
+
     public PrecisionChronometer setOnChronometerTickListener  (OnChronometerTickListener listener)
             { mOnChronometerTickListener = listener; return this; }
     public PrecisionChronometer setOnChronometerStartStopListener(OnChronometerStartStopListener listener)
@@ -573,6 +607,8 @@ public class PrecisionChronometer extends AppCompatTextView {
     public String  getTimeElapsedString() { return getHumanReadableTime(getTimeElapsed()); }
     public long    getBase()              { return m_aBase; }
 
+    protected boolean isRunning() { return mRunning; }
+
     /*
      * Переменные состояния, актуальные для секундомера
      * mStarted, mOnHold, mDelayed
@@ -672,24 +708,6 @@ public class PrecisionChronometer extends AppCompatTextView {
         super.onRestoreInstanceState(state);
         unfreeze();
     }
-
-    private Handler mHandler = new Handler() {
-        public void handleMessage(Message m) {
-            if (!mRunning) return;
-
-            switch (m.what) {
-                case TICK_MESSAGE:
-                    updateText(SystemClock.elapsedRealtime());
-                    dispatchTick();
-                    sendMessageDelayed(Message.obtain(this, TICK_MESSAGE), 97);
-
-                    break;
-                case DELAYED_HOLD_MESSAGE:
-                    hold();
-                    break;
-            }
-        }
-    };
 
     void dispatchEvent(Event type) {
         if (mOnChronometerStartStopListener != null) {

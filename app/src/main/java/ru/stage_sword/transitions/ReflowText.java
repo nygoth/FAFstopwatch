@@ -56,6 +56,7 @@ import ru.stage_sword.fafstopwatch.R;
  * <p>
  * Strongly recommended to use a curved {@code pathMotion} for a more natural transition.
  */
+@SuppressWarnings("unused")
 public class ReflowText extends Transition {
 
     private static final String TAG = "ReflowText";
@@ -70,10 +71,7 @@ public class ReflowText extends Transition {
     private static final int OPACITY_MID_TRANSITION = (int) (0.8f * OPAQUE);
 //    private static final float STAGGER_DELAY = 0.8f;
 
-    private int velocity      = 700;         // pixels per second
     private long minDuration  = 10;     // ms
-    private long maxDuration  = 1000;     // ms
-    private long staggerDelay = 40;     // ms
     private long _duration;
     // this is hack for preventing view from drawing briefly at the end of the transition :(
     private boolean freezeFrame = false;
@@ -81,10 +79,7 @@ public class ReflowText extends Transition {
     public ReflowText(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ReflowText);
-        velocity = a.getDimensionPixelSize(R.styleable.ReflowText_velocity, velocity);
         minDuration = a.getInt(R.styleable.ReflowText_minDuration, (int) minDuration);
-        maxDuration = a.getInt(R.styleable.ReflowText_maxDuration, (int) maxDuration);
-        staggerDelay = a.getInt(R.styleable.ReflowText_staggerDelay, (int) staggerDelay);
         freezeFrame = a.getBoolean(R.styleable.ReflowText_freezeFrame, false);
         a.recycle();
     }
@@ -537,7 +532,7 @@ public class ReflowText extends Transition {
      * Interface describing a view which supports re-flowing i.e. it exposes enough information to
      * construct a {@link ReflowData} object;
      */
-    public interface Reflowable<T extends View> {
+    interface Reflowable<T extends View> {
 
         T getView();
         String getText();
@@ -550,11 +545,11 @@ public class ReflowText extends Transition {
     /**
      * Wraps a {@link TextView} and implements {@link Reflowable}.
      */
-    public static class ReflowableTextView implements Reflowable<TextView> {
+    private static class ReflowableTextView implements Reflowable<TextView> {
 
         private final TextView textView;
 
-        public ReflowableTextView(TextView textView) {
+        ReflowableTextView(TextView textView) {
             this.textView = textView;
         }
 

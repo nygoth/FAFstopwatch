@@ -16,23 +16,19 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import static ru.stage_sword.fafstopwatch.PrecisionChronometer.DELAYED;
-import static ru.stage_sword.fafstopwatch.PrecisionChronometer.ON_HOLD;
 import static ru.stage_sword.fafstopwatch.PrecisionChronometer.ON_OFF;
 import static ru.stage_sword.fafstopwatch.PrecisionChronometer.ON_OFF_DELAYED;
-import static ru.stage_sword.fafstopwatch.PrecisionChronometer.PAUSED;
-import static ru.stage_sword.fafstopwatch.PrecisionChronometer.STARTED;
-import static ru.stage_sword.fafstopwatch.PrecisionChronometer.STOPPED;
 import static ru.stage_sword.fafstopwatch.PrecisionChronometer.UNKNOWN_STATE;
 
 public class StopwatchActivity extends AppCompatActivity
         implements  View.OnClickListener,
                     View.OnLongClickListener,
                     PrecisionChronometer.OnChronometerHoldListener {
+    @SuppressWarnings("unused")
     private static final String TAG = "FAF";
 
     /**
@@ -42,13 +38,13 @@ public class StopwatchActivity extends AppCompatActivity
     private static final int UI_ANIMATION_DELAY = 200;
     private static final String UI_VISIBLE_STATE           = "uiVisible";
     private static final String CURRENT_VIEW               = "currentView";
-    private static final String TOTAL_TIMER_BASE           = "totalTimeBase";
-    private static final String SPECIAL_TIMER_BASE         = "specialTimeBase";
-    private static final String TOTAL_TIMER_VALUE          = "totalTimeElapsed";
-    private static final String SPECIAL_TIMER_VALUE        = "specialTimeElapsed";
-    private static final String TOTAL_TIMER_STATE          = "totalTimerState";
     private static final String SPECIAL_TIMER_STATE        = "specialTimerState";
-    private static final String SPECIAL_TIMER_TIME_TO_HOLD = "specialTimerTimeToHold";
+//    private static final String TOTAL_TIMER_BASE           = "totalTimeBase";
+//    private static final String SPECIAL_TIMER_BASE         = "specialTimeBase";
+//    private static final String TOTAL_TIMER_VALUE          = "totalTimeElapsed";
+//    private static final String SPECIAL_TIMER_VALUE        = "specialTimeElapsed";
+//    private static final String TOTAL_TIMER_STATE          = "totalTimerState";
+//    private static final String SPECIAL_TIMER_TIME_TO_HOLD = "specialTimerTimeToHold";
 
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -85,24 +81,25 @@ public class StopwatchActivity extends AppCompatActivity
             hide();
         }
     };
+
     /**
      * Touch listener to use for in-layout UI controls to delay hiding the
      * system UI. This is to prevent the jarring behavior of controls going away
      * while interacting with activity UI.
      */
-    private final View.OnTouchListener mTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-//            if (AUTO_HIDE) {
-//                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-//            }
-            return false;
-        }
-    };
+//    private final View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+//        @Override
+//        public boolean onTouch(View view, MotionEvent motionEvent) {
+////            if (AUTO_HIDE) {
+////                delayedHide(AUTO_HIDE_DELAY_MILLIS);
+////            }
+//            return false;
+//        }
+//    };
+
     private PrecisionChronometer mSpecialTimerView;
     private final Handler mHideHandler = new Handler();
     private PrecisionChronometer mTotalTimerView;
-    private ViewGroup mSceneRoot;
     private Scene mTotalTimerScene;
     private Scene mSpecialTimerScene;
     private Scene mResultsScene;
@@ -127,13 +124,13 @@ public class StopwatchActivity extends AppCompatActivity
             mNotifyVibrate = false;
 
             outState.putBoolean(UI_VISIBLE_STATE, mVisible);
+            outState.putInt (SPECIAL_TIMER_STATE,       mSpecialTimerView.getState());
 
 //            outState.putLong(TOTAL_TIMER_BASE,          mTotalTimerView.getBase());
 //            outState.putLong(SPECIAL_TIMER_BASE,        mSpecialTimerView.getBase());
 //            outState.putLong(TOTAL_TIMER_VALUE,         mTotalTimerView.getTimeElapsed());
 //            outState.putLong(SPECIAL_TIMER_VALUE,       mSpecialTimerView.getTimeElapsed());
 //            outState.putInt (TOTAL_TIMER_STATE,         mTotalTimerView.getState());
-            outState.putInt (SPECIAL_TIMER_STATE,       mSpecialTimerView.getState());
 //            outState.putInt (SPECIAL_TIMER_TIME_TO_HOLD,mSpecialTimerView.getTimeToHold(true));
         }
 
@@ -146,10 +143,10 @@ public class StopwatchActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_stopwatch);
 
-        long totalTimerBase = 0;
-        long specialTimerBase = 0;
-        long totalTimerElapsed = 0;
-        long specialTimerElapsed = 0;
+//        long totalTimerBase = 0;
+//        long specialTimerBase = 0;
+//        long totalTimerElapsed = 0;
+//        long specialTimerElapsed = 0;
 //        int totalTimerState = UNKNOWN_STATE;
         int specialTimerState = UNKNOWN_STATE;
 
@@ -159,12 +156,12 @@ public class StopwatchActivity extends AppCompatActivity
             mVisible = savedInstanceState.getBoolean(UI_VISIBLE_STATE, true);
 
             currentView         = savedInstanceState.getInt (CURRENT_VIEW, R.layout.total_timer_scene);
+            specialTimerState   = savedInstanceState.getInt (SPECIAL_TIMER_STATE, UNKNOWN_STATE);
 //            totalTimerBase      = savedInstanceState.getLong(TOTAL_TIMER_BASE, 0);
 //            specialTimerBase    = savedInstanceState.getLong(SPECIAL_TIMER_BASE, 0);
 //            totalTimerElapsed   = savedInstanceState.getLong(TOTAL_TIMER_VALUE, 0);
 //            specialTimerElapsed = savedInstanceState.getLong(SPECIAL_TIMER_VALUE, 0);
 //            totalTimerState     = savedInstanceState.getInt (TOTAL_TIMER_STATE, UNKNOWN_STATE);
-            specialTimerState   = savedInstanceState.getInt (SPECIAL_TIMER_STATE, UNKNOWN_STATE);
 //            timeToHold          = savedInstanceState.getInt (SPECIAL_TIMER_TIME_TO_HOLD, 0);
         }
 
@@ -173,16 +170,16 @@ public class StopwatchActivity extends AppCompatActivity
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
-        mSceneRoot = findViewById(R.id.timer_scene_root);
+        ViewGroup sceneRoot = findViewById(R.id.timer_scene_root);
 
-        mTotalTimerScene   = Scene.getSceneForLayout(mSceneRoot, R.layout.total_timer_scene,   this);
-        mSpecialTimerScene = Scene.getSceneForLayout(mSceneRoot, R.layout.special_timer_scene, this);
-        mResultsScene      = Scene.getSceneForLayout(mSceneRoot, R.layout.final_results_scene, this);
+        mTotalTimerScene   = Scene.getSceneForLayout(sceneRoot, R.layout.total_timer_scene,   this);
+        mSpecialTimerScene = Scene.getSceneForLayout(sceneRoot, R.layout.special_timer_scene, this);
+        mResultsScene      = Scene.getSceneForLayout(sceneRoot, R.layout.final_results_scene, this);
 
-        LayoutInflater.from(this).inflate(currentView,mSceneRoot);
+        LayoutInflater.from(this).inflate(currentView, sceneRoot);
 
         TransitionInflater inflater = TransitionInflater.from(this);
-        mTransitionManager = inflater.inflateTransitionManager(R.transition.chronometer_transitions, mSceneRoot);
+        mTransitionManager = inflater.inflateTransitionManager(R.transition.chronometer_transitions, sceneRoot);
 
         mAnimationDuration = getResources().getInteger(R.integer.timer_animation_duration);
         mSpecialTimerStopDelay = getResources().getInteger(R.integer.special_timer_default_stop_delay);
@@ -361,6 +358,8 @@ public class StopwatchActivity extends AppCompatActivity
             show(immediately);
         }
     }
+
+    @SuppressWarnings("unused")
     private void toggle() {
         if (mVisible) {
             hide();
@@ -435,6 +434,7 @@ public class StopwatchActivity extends AppCompatActivity
         notifyVibrate();
     }
 
+    @SuppressWarnings("deprecation")
     private void notifyVibrate() {
         if(mNotifyVibrate)
             ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(100);
