@@ -12,6 +12,7 @@ import android.support.transition.TransitionInflater;
 import android.support.transition.TransitionManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -196,7 +197,7 @@ public class StopwatchActivity extends AppCompatActivity
             case R.layout.special_timer_scene:
                 SpecialTimerSetup();
                 if (specialTimerState == DELAYED) { // Изменим цвет фона для соответствующего состояния
-                    TransitionDrawable trans = (TransitionDrawable) mSpecialTimerView.getBackground();
+                    TransitionDrawable trans = (TransitionDrawable) mSpecialTimerBackgroundView.getBackground();
                     trans.resetTransition();
                     trans.startTransition(0);
                 }
@@ -323,9 +324,10 @@ public class StopwatchActivity extends AppCompatActivity
     }
 
     private void activateResultsView() {
-        show();
         long totalTimeElapsed   = mTotalTimerView.getTimeElapsed();
         long specialTimeElapsed = mSpecialTimerView.getTimeElapsed();
+
+        show();
 
         mSpecialTimerView.setOnChronometerHoldListener(null);
 

@@ -9,6 +9,7 @@ import android.os.Parcelable;
 import android.os.SystemClock;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import java.lang.ref.WeakReference;
 
@@ -221,7 +222,6 @@ public class PrecisionChronometer extends AppCompatTextView {
                         holder.updateText(SystemClock.elapsedRealtime());
                         holder.dispatchTick();
                         sendMessageDelayed(Message.obtain(this, TICK_MESSAGE), 97);
-
                         break;
                     case DELAYED_HOLD_MESSAGE:
                         holder.hold();
@@ -331,9 +331,10 @@ public class PrecisionChronometer extends AppCompatTextView {
     public void stop() {
         if(!mInitialised || mFrozen) return;
 
-        mStarted = false;
-        _toggle();
-        mInitialised = false;
+        if(!mOnHold)
+            hold();
+
+        mOnHold = mInitialised = false;
         dispatchEvent(Event.STOP);
     }
 
@@ -361,7 +362,7 @@ public class PrecisionChronometer extends AppCompatTextView {
 
         if(!mInitialised && mStarted) {
             resetBase();
-            mInitialised = mStarted = true;
+            mInitialised = true;
             dispatchEvent(Event.START);
         } else
             changeChronometerState();
@@ -380,6 +381,7 @@ public class PrecisionChronometer extends AppCompatTextView {
          * m_aHoldTime уже установлена на момент нажатия стопа. Во всех других случаях устанавливаем
          * эту переменную на момент выполнения останова хронометра.
          */
+        mHandler.removeMessages(TICK_MESSAGE);
         mHandler.removeMessages(DELAYED_HOLD_MESSAGE);
         if(mDelayType != EXCLUSIVE || mChronometerType != ON_OFF_DELAYED)
             m_aHoldTime = SystemClock.elapsedRealtime();
@@ -388,6 +390,7 @@ public class PrecisionChronometer extends AppCompatTextView {
         mOnHold = true;
 
         dispatchEvent(Event.HOLD);
+
     }
 
     private void _unhold() {
@@ -461,14 +464,15 @@ public class PrecisionChronometer extends AppCompatTextView {
         }
     }
 
-    private void updateRunning() {
+    private synchronized void updateRunning() {
         if(mFrozen) return;
 
         boolean running = mVisible && (mStarted || mDelayed);
 
         if (running != mRunning) {
+            updateText(getCurrentChronometerAbsoluteTime());
+
             if (running) {
-                updateText(SystemClock.elapsedRealtime());
                 dispatchTick();
                 mHandler.sendMessageDelayed(Message.obtain(mHandler, TICK_MESSAGE), 10);
             } else {
@@ -569,15 +573,31 @@ public class PrecisionChronometer extends AppCompatTextView {
 
     public PrecisionChronometer setBase(long base) {
         m_aBase = base;
-
         if(!mFrozen) {
+            updateText(getCurrentChronometerAbsoluteTime());
             dispatchTick();
-            updateText(SystemClock.elapsedRealtime());
+        } else {
+            // Чтобы хронометр не ушёл в минус при смене базы в замороженном состоянии
+            if (m_aFreezeTime < m_aBase)
+                m_aFreezeTime = m_aBase;
         }
+
+        mInitialised = true;
 
         return this;
     }
 
+    /*
+     * resetBase не устанавливает mInitialised в true
+     * Зато это делает setBase
+     *
+     * Смысл в том, что сбрасывая базу, мы устанавливаем в виджете 0
+     * и обнуляем флаги, так что при старте система вновь установит
+     * базу на момент старта
+     *
+     * А если мы базу явно устанавливаем, то старт не должен её менять
+     * Иначе какой смысл её устанавливать.
+     */
     public PrecisionChronometer resetBase() {
         init();
         if(!mFrozen)
@@ -585,14 +605,36 @@ public class PrecisionChronometer extends AppCompatTextView {
         return this;
     }
 
-    public PrecisionChronometer setTimeElapsed(long elapsed) {
-        long calculationBase = m_aFreezeTime != 0 ? m_aFreezeTime : SystemClock.elapsedRealtime();
-        return setBase(calculationBase - elapsed);
+    /*
+     * Что мы должны вернуть, как прошедшее время, для разных состояний хронометра:
+     * STARTED -- интервал от текущего времени до базы            (mStarted == true)
+     * DELAYED -- интервал от текущего времени до базы            (mDelayed == true)
+     * PAUSED  -- интервал от текущего времени до базы            (mStarted == false && mInitialised == true)
+     * ON_HOLD -- интервал от времени постановки на холд до базы  (mOnHold  == true)
+     * STOPPED -- интервал от времени останова до базы            (mStarted == false && mInitialised = false)
+     * FROZEN  -- время от момента заморозки до базы              (mFrozen  == true), если STARTED, DELAYED или PAUSED
+     */
+    private long getCurrentChronometerAbsoluteTime() {
+        long value = m_aHoldTime == 0 ? m_aBase : m_aHoldTime;
+        boolean paused = !mStarted && mInitialised && !mOnHold;
+
+        return mStarted || mDelayed || paused ?
+                (mFrozen ? m_aFreezeTime : SystemClock.elapsedRealtime()) :
+                value;
     }
 
-    public long getTimeElapsed() {
-        long calculationBase = m_aFreezeTime != 0 ? m_aFreezeTime : SystemClock.elapsedRealtime();
-        return calculationBase - m_aBase;
+    /*
+     * setBase тоже вызывает getCurrentChronometerAbsoluteTime(). Чтобы результаты были корректными,
+     * необходимо изменять данные после первого вызова, но до установки новой базы
+     */
+    public PrecisionChronometer setTimeElapsed  (long elapsed) {
+        long base = getCurrentChronometerAbsoluteTime();
+        if(m_aHoldTime == 0)
+            m_aHoldTime = base;
+
+        setBase(base - elapsed);
+
+        return this;
     }
 
     public PrecisionChronometer setType         (int type)      { mChronometerType = type; return this;}
@@ -604,6 +646,7 @@ public class PrecisionChronometer extends AppCompatTextView {
     public int     getType()              { return mChronometerType; }
     public int     getStopDelay()         { return mStopDelay; }
     public int     getStopDelayType()     { return mDelayType; }
+    public long    getTimeElapsed()       { return getCurrentChronometerAbsoluteTime() - m_aBase; }
     public String  getTimeElapsedString() { return getHumanReadableTime(getTimeElapsed()); }
     public long    getBase()              { return m_aBase; }
 
