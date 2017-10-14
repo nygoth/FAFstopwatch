@@ -1,6 +1,9 @@
 package ru.stage_sword.fafstopwatch;
 
 import android.annotation.SuppressLint;
+import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.app.ActionBar;
 import android.content.Context;
 import android.graphics.drawable.TransitionDrawable;
@@ -12,13 +15,15 @@ import android.support.transition.TransitionInflater;
 import android.support.transition.TransitionManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import static ru.stage_sword.fafstopwatch.PrecisionChronometer.DELAYED;
 import static ru.stage_sword.fafstopwatch.PrecisionChronometer.ON_OFF;
@@ -37,15 +42,18 @@ public class StopwatchActivity extends AppCompatActivity
      * and a change of the status and navigation bar.
      */
     private static final int UI_ANIMATION_DELAY = 200;
-    private static final String UI_VISIBLE_STATE           = "uiVisible";
-    private static final String CURRENT_VIEW               = "currentView";
-    private static final String SPECIAL_TIMER_STATE        = "specialTimerState";
-//    private static final String TOTAL_TIMER_BASE           = "totalTimeBase";
-//    private static final String SPECIAL_TIMER_BASE         = "specialTimeBase";
-//    private static final String TOTAL_TIMER_VALUE          = "totalTimeElapsed";
-//    private static final String SPECIAL_TIMER_VALUE        = "specialTimeElapsed";
-//    private static final String TOTAL_TIMER_STATE          = "totalTimerState";
-//    private static final String SPECIAL_TIMER_TIME_TO_HOLD = "specialTimerTimeToHold";
+
+    private static final String UI_VISIBLE_STATE    = "uiVisible";
+    private static final String CURRENT_VIEW        = "mCurrentView";
+    private static final String SPECIAL_TIMER_STATE = "specialTimerState";
+
+    /*
+     * Индексы значений времени в массивах
+     */
+    private static final int SOLO    = R.id.radio_Solo;
+    private static final int SYNCHRO = R.id.radio_Synchro;
+    private static final int DUET    = R.id.radio_Duet;
+    private static final int GROUP   = R.id.radio_Group;
 
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -83,6 +91,45 @@ public class StopwatchActivity extends AppCompatActivity
         }
     };
 
+    private final RadioGroup.OnCheckedChangeListener mDisciplineSelector = new RadioGroup.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
+            if (i == -1) {
+                findViewById(R.id.total_overrun_title).setVisibility(View.GONE);
+                findViewById(R.id.special_underrun_title).setVisibility(View.GONE);
+                return;
+            }
+
+            long elapsed, total;
+
+            // Общее время должно быть не больше
+            if (mTotalTimerView != null) {
+                elapsed = mTotalTimerView.getTimeElapsed() / 10;
+                total = mDisciplineTotalDuration.get(i);
+                setTimeComment((int) ((elapsed - total) * 10),
+                        (TextView)findViewById(R.id.total_overrun_title), R.string.overrun_title);
+            }
+
+            // А фехтовального времени должно быть не меньше
+            if (mSpecialTimerView != null) {
+                elapsed = mSpecialTimerView.getTimeElapsed() / 10;
+                total = mDisciplineFencingDuration.get(i);
+                setTimeComment((int) ((total - elapsed) * 10),
+                        (TextView)findViewById(R.id.special_underrun_title), R.string.underrun_title);
+            }
+        }
+
+        private void setTimeComment(int time, TextView widget, @StringRes int stringId) {
+            if (time > 0) {
+                String msg = getResources().getString(stringId);
+                widget.setText(String.format(msg, PrecisionChronometer.getHumanReadableTime(time)));
+                widget.setVisibility(View.VISIBLE);
+            } else {
+                widget.setVisibility(View.GONE);
+            }
+        }
+    };
+
     /**
      * Touch listener to use for in-layout UI controls to delay hiding the
      * system UI. This is to prevent the jarring behavior of controls going away
@@ -108,9 +155,11 @@ public class StopwatchActivity extends AppCompatActivity
     private TransitionManager mTransitionManager;
     private int mAnimationDuration;
     private View mSpecialTimerBackgroundView;
-    private static int currentView = R.layout.total_timer_scene;
+    private static int mCurrentView = R.layout.total_timer_scene;
     private int mSpecialTimerStopDelay;
     private boolean mNotifyVibrate;
+    private ArrayMap<Integer, Integer> mDisciplineTotalDuration = new ArrayMap<>();
+    private ArrayMap<Integer, Integer> mDisciplineFencingDuration = new ArrayMap<>();
 
     //    @Override
 //    public void onConfigurationChanged(Configuration newConfig) {
@@ -119,20 +168,13 @@ public class StopwatchActivity extends AppCompatActivity
 //
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt(CURRENT_VIEW, currentView);
+        outState.putInt(CURRENT_VIEW, mCurrentView);
 
-        if(currentView != R.layout.total_timer_scene) {
+        if(mCurrentView != R.layout.total_timer_scene) {
             mNotifyVibrate = false;
 
-            outState.putBoolean(UI_VISIBLE_STATE, mVisible);
-            outState.putInt (SPECIAL_TIMER_STATE,       mSpecialTimerView.getState());
-
-//            outState.putLong(TOTAL_TIMER_BASE,          mTotalTimerView.getBase());
-//            outState.putLong(SPECIAL_TIMER_BASE,        mSpecialTimerView.getBase());
-//            outState.putLong(TOTAL_TIMER_VALUE,         mTotalTimerView.getTimeElapsed());
-//            outState.putLong(SPECIAL_TIMER_VALUE,       mSpecialTimerView.getTimeElapsed());
-//            outState.putInt (TOTAL_TIMER_STATE,         mTotalTimerView.getState());
-//            outState.putInt (SPECIAL_TIMER_TIME_TO_HOLD,mSpecialTimerView.getTimeToHold(true));
+            outState.putBoolean(UI_VISIBLE_STATE,    mVisible);
+            outState.putInt    (SPECIAL_TIMER_STATE, mSpecialTimerView.getState());
         }
 
         super.onSaveInstanceState(outState);
@@ -144,29 +186,12 @@ public class StopwatchActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_stopwatch);
 
-//        long totalTimerBase = 0;
-//        long specialTimerBase = 0;
-//        long totalTimerElapsed = 0;
-//        long specialTimerElapsed = 0;
-//        int totalTimerState = UNKNOWN_STATE;
-        int specialTimerState = UNKNOWN_STATE;
-
         mNotifyVibrate = true;
         mVisible = true;
         if (savedInstanceState != null) {
-            mVisible = savedInstanceState.getBoolean(UI_VISIBLE_STATE, true);
-
-            currentView         = savedInstanceState.getInt (CURRENT_VIEW, R.layout.total_timer_scene);
-            specialTimerState   = savedInstanceState.getInt (SPECIAL_TIMER_STATE, UNKNOWN_STATE);
-//            totalTimerBase      = savedInstanceState.getLong(TOTAL_TIMER_BASE, 0);
-//            specialTimerBase    = savedInstanceState.getLong(SPECIAL_TIMER_BASE, 0);
-//            totalTimerElapsed   = savedInstanceState.getLong(TOTAL_TIMER_VALUE, 0);
-//            specialTimerElapsed = savedInstanceState.getLong(SPECIAL_TIMER_VALUE, 0);
-//            totalTimerState     = savedInstanceState.getInt (TOTAL_TIMER_STATE, UNKNOWN_STATE);
-//            timeToHold          = savedInstanceState.getInt (SPECIAL_TIMER_TIME_TO_HOLD, 0);
+            mVisible     = savedInstanceState.getBoolean(UI_VISIBLE_STATE, true);
+            mCurrentView = savedInstanceState.getInt    (CURRENT_VIEW,     R.layout.total_timer_scene);
         }
-
-//        mControlsView = findViewById(R.id.fullscreen_content_controls);
 
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
@@ -177,23 +202,51 @@ public class StopwatchActivity extends AppCompatActivity
         mSpecialTimerScene = Scene.getSceneForLayout(sceneRoot, R.layout.special_timer_scene, this);
         mResultsScene      = Scene.getSceneForLayout(sceneRoot, R.layout.final_results_scene, this);
 
-        LayoutInflater.from(this).inflate(currentView, sceneRoot);
+        LayoutInflater.from(this).inflate(mCurrentView, sceneRoot);
 
         TransitionInflater inflater = TransitionInflater.from(this);
         mTransitionManager = inflater.inflateTransitionManager(R.transition.chronometer_transitions, sceneRoot);
 
         mAnimationDuration = getResources().getInteger(R.integer.timer_animation_duration);
+
+        /*
+         * Величины, определяющие временные нормативы конкретных дисциплин
+         */
+        // Интервал, который идёт в зачёт фехтовальной практики после её окончания
         mSpecialTimerStopDelay = getResources().getInteger(R.integer.special_timer_default_stop_delay);
 
+        // Общая продолжительность выступления в соответствующих дисциплинах. В миллисекундах
+        mDisciplineTotalDuration.put(SOLO,    getResources().getInteger(R.integer.solo_discipline_total_duration));
+        mDisciplineTotalDuration.put(GROUP,   getResources().getInteger(R.integer.group_discipline_total_duration));
+        mDisciplineTotalDuration.put(DUET,    getResources().getInteger(R.integer.duet_discipline_total_duration));
+        mDisciplineTotalDuration.put(SYNCHRO, getResources().getInteger(R.integer.synchro_discipline_total_duration));
+
+        mDisciplineFencingDuration.put(SOLO,    getResources().getInteger(R.integer.solo_discipline_fencing_duration));
+        mDisciplineFencingDuration.put(GROUP,   getResources().getInteger(R.integer.group_discipline_fencing_duration));
+        mDisciplineFencingDuration.put(DUET,    getResources().getInteger(R.integer.duet_discipline_fencing_duration));
+        mDisciplineFencingDuration.put(SYNCHRO, getResources().getInteger(R.integer.synchro_discipline_fencing_duration));
+
         mTouchpad = findViewById(R.id.touchpad);
+        if(mCurrentView == R.layout.final_results_scene)
+            ((RadioGroup) findViewById(R.id.discipline_selector)).setOnCheckedChangeListener(mDisciplineSelector);
+
+        actualizeUIVisibility();
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        int specialTimerState = UNKNOWN_STATE;
+        if (savedInstanceState != null) {
+            specialTimerState = savedInstanceState.getInt(SPECIAL_TIMER_STATE, UNKNOWN_STATE);
+        }
+
         setTouchpadListeners();
 
         TotalTimerSetup();
-//        applyTimerState(mTotalTimerView,   totalTimerState,   timeToHold);
-//        if (totalTimerBase != 0)
-//            mTotalTimerView.setBase(totalTimerBase);
 
-        switch (currentView) {
+        switch (mCurrentView) {
             case R.layout.special_timer_scene:
                 SpecialTimerSetup();
                 if (specialTimerState == DELAYED) { // Изменим цвет фона для соответствующего состояния
@@ -202,51 +255,31 @@ public class StopwatchActivity extends AppCompatActivity
                     trans.startTransition(0);
                 }
 
-//                if (specialTimerBase != 0 && specialTimerElapsed != 0)
-//                    mSpecialTimerView.setBase(specialTimerBase);
-
                 break;
             case R.layout.final_results_scene:
                 mSpecialTimerView = findViewById(R.id.special_timer_view);
-//                if (specialTimerBase != 0)
-//                    mSpecialTimerView.setTimeElapsed(specialTimerElapsed);
-//
-//                if (totalTimerBase != 0)
-//                    mTotalTimerView.setTimeElapsed(totalTimerElapsed);
+                removeTouchpadListeners();
+
+                // Смысл этого кода в том, что слушатель mDisciplineSelector устанавливается раньше, чем
+                // актуализируются секундомеры. Поэтому, когда вызывается onCheckedChanged() (при восстановлении состояния)
+                // мы ещё не имеем даже инициализированных mTotalTimerView и mSpecialTimerView
+                // Поэтому тут его нужно вызвать ещё раз.
+                // Если слушатель устанавливать иначе, чем сделано сейчас, то он либо:
+                // 1) не вызовется, так как состояние RadioButton устанавливается раньше, чем контрол
+                //    узнаёт о наличии слушателя,
+                // 2) либо из секундомеров считаются нули, так как система ещё не восстановила их состояния
+                RadioGroup buttons = findViewById(R.id.discipline_selector);
+                mDisciplineSelector.onCheckedChanged(buttons, buttons.getCheckedRadioButtonId());
                 break;
         }
-
-        actualize();
     }
 
-//    private void applyTimerState(PrecisionChronometer timer, int state) {
-//        switch (state) {
-//            case STOPPED:
-//                timer.stop();
-//                break;
-//            case STARTED:
-//                timer.start();
-//                break;
-//            case PAUSED:
-//            case ON_HOLD:
-//                timer.toggle(state == STARTED);
-//                break;
-//            case DELAYED:
-//                // Здесь мы запускаем хронометр и сразу же переключаем его в режим паузы
-//                // Но выставляем не задержку по умолчанию, а свою, требуемую.
-//                // FIXME Здесь будет глючить таймер EXCLUSIVE. Он запоминает HoldTime, а потом мы меняем базу
-//                // FIXME В результате, всё будет некорректно. Для INCLUSIVE таймера пофиг, он всё равно
-//                // FIXME перезапоминает холд тайм по стопу, и что, что где-то на холд реквест интервале
-//                // FIXME поменяли базу, ему пофиг
-//                timer.toggle(true);
-////                timer.toggle(timeToHold);
-//                break;
-//        }
-//    }
+    private void setDisciplineButtons(int checkedDiscipline) {
+        RadioGroup buttons = findViewById(R.id.discipline_selector);
+        buttons.setOnCheckedChangeListener(mDisciplineSelector);
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
+        if(checkedDiscipline != -1)
+            buttons.check(checkedDiscipline);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -314,7 +347,7 @@ public class StopwatchActivity extends AppCompatActivity
 
     private void activateSpecialTimerView() {
         mTransitionManager.transitionTo(mSpecialTimerScene);
-        currentView = R.layout.special_timer_scene;
+        mCurrentView = R.layout.special_timer_scene;
 
         TotalTimerSetup();
 
@@ -334,25 +367,27 @@ public class StopwatchActivity extends AppCompatActivity
         removeTouchpadListeners();
 
         mTransitionManager.transitionTo(mResultsScene);
-        currentView = R.layout.final_results_scene;
+        mCurrentView = R.layout.final_results_scene;
 
         mTotalTimerView   = findViewById(R.id.total_timer_view);
         mSpecialTimerView = findViewById(R.id.special_timer_view);
 
         mTotalTimerView.setTimeElapsed(totalTimeElapsed);
         mSpecialTimerView.setTimeElapsed(specialTimeElapsed);
+
+        setDisciplineButtons(R.id.radio_Solo);
     }
 
     public void activateTotalTimerView(View view) {
         mTransitionManager.transitionTo(mTotalTimerScene);
-        currentView = R.layout.total_timer_scene;
+        mCurrentView = R.layout.total_timer_scene;
         show();
 
         TotalTimerSetup();
         setTouchpadListeners();
     }
 
-    private void actualize() { acrualize(false); }
+    private void actualizeUIVisibility() { acrualize(false); }
     private void acrualize(boolean immediately) {
         if (!mVisible) {
             hide(immediately);

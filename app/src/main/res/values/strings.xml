@@ -11,4 +11,6 @@
     <string name="group_label">Group</string>
     <string name="button_start_again_text">Start again</string>
     <string name="action_settings">Settings</string>
+    <string name="overrun_title">Overrun: %s s</string>
+    <string name="underrun_title">Underrun: %s s</string>
 </resources>

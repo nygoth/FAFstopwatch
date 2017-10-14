@@ -9,7 +9,6 @@ import android.os.Parcelable;
 import android.os.SystemClock;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import java.lang.ref.WeakReference;
 
@@ -485,7 +484,7 @@ public class PrecisionChronometer extends AppCompatTextView {
     private synchronized void updateText(long now) { setText(getHumanReadableTime(now - m_aBase)); }
 
     @SuppressLint("DefaultLocale")
-    private String getHumanReadableTime(long time) {
+    public static String getHumanReadableTime(long time) {
         int hours = (int)(time / (3600 * 1000));
         int remaining = (int)(time % (3600 * 1000));
 
@@ -582,7 +581,14 @@ public class PrecisionChronometer extends AppCompatTextView {
                 m_aFreezeTime = m_aBase;
         }
 
+        // Фишка в том, что вызов этой функции на неинициализированном секундомере
+        // приведёт к тому, что он окажется в состоянии PAUSED. Т.е., по факту,
+        // идущим, но не отображающим ход времени. В результате getTimeElapsed()
+        // будет возвращать всегда новое значение. Это неприемлимо, поэтому, если
+        // при установке базы у нас секундомер не запущен, то ставим его на холд.
         mInitialised = true;
+        if(!mStarted)
+            mOnHold = true;
 
         return this;
     }

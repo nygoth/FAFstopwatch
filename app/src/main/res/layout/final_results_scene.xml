@@ -39,66 +39,9 @@
          android:layout_width="match_parent"
          android:layout_height="match_parent">
 
-        <FrameLayout
-            android:id="@+id/total_timer_background"
-            android:padding="@dimen/time_title_padding_small"
-            android:background="@color/total_timer_back"
-            android:layout_margin="@dimen/time_title_padding_small"
-            android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <include layout="@layout/total_timer_layout"/>
 
-            <TextView
-                android:id="@+id/total_timer_title"
-                android:layout_gravity="top"
-                android:gravity="start"
-                android:text="@string/total_time_title"
-                android:textSize="@dimen/time_title_textsize"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <ru.stage_sword.fafstopwatch.PrecisionChronometer
-                android:id="@+id/total_timer_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:keepScreenOn="true"
-                android:text="@string/timer_content"
-                android:textColor="@color/black"
-                android:textSize="@dimen/timer_text_size_mid"
-                android:textStyle="bold"/>
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/special_timer_background"
-            android:padding="@dimen/time_title_padding_small"
-            android:background="@color/special_timer_back"
-            android:layout_margin="@dimen/time_title_padding_small"
-            android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:layout_gravity="top"
-                android:gravity="start"
-                android:text="@string/special_time_title"
-                android:textSize="@dimen/time_title_textsize"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-            <ru.stage_sword.fafstopwatch.PrecisionChronometer
-                android:id="@+id/special_timer_view"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:keepScreenOn="true"
-                android:text="@string/timer_content"
-                android:textColor="@color/black"
-                android:textSize="@dimen/timer_text_size_mid"
-                android:textStyle="bold"/>
-        </FrameLayout>
+        <include layout="@layout/special_timer_layout"/>
 
         <Button
             android:id="@+id/button_start_again"

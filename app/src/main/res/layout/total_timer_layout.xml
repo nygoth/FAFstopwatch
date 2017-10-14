@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:id="@+id/total_timer_background"
+             android:padding="@dimen/time_title_padding_small"
+             android:background="@color/total_timer_back"
+             android:layout_margin="@dimen/time_title_padding_small"
+             android:layout_weight="1"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/total_timer_title"
+        android:layout_gravity="top"
+        android:gravity="start"
+        android:text="@string/total_time_title"
+        android:textSize="@dimen/time_title_textsize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <ru.stage_sword.fafstopwatch.PrecisionChronometer
+        android:id="@+id/total_timer_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:keepScreenOn="true"
+        android:text="@string/timer_content"
+        android:textColor="@color/black"
+        android:textSize="@dimen/timer_text_size_mid"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/total_overrun_title"
+        android:layout_gravity="bottom|end"
+        android:textColor="@color/alert_color"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:text="@string/overrun_title"
+        android:textSize="@dimen/time_title_textsize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</FrameLayout>

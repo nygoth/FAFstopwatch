@@ -10,4 +10,6 @@
     <string name="group_label">Группа</string>
     <string name="button_start_again_text">Начать заново</string>
     <string name="action_settings">Настройки</string>
+    <string name="overrun_title">Перебор: %s сек</string>
+    <string name="underrun_title">Недобор: %s сек</string>
 </resources>
