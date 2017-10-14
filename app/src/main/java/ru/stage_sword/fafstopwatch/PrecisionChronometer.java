@@ -102,7 +102,7 @@ public class PrecisionChronometer extends AppCompatTextView {
     * Chronometer types
     */
     public static final int UNKNOWN        = 0; // Strange Stopwatch
-    public static final int CONTUINOUS     = 1; // Stopwatch, that continue counting after start until it is explicitly reset
+    public static final int CONTINUOUS     = 1; // Stopwatch, that continue counting after start until it is explicitly reset
     public static final int ON_OFF         = 2; // Just start and stop by command
     public static final int ON_OFF_DELAYED = 3; // Stop after given delay from stop command
 
@@ -429,7 +429,7 @@ public class PrecisionChronometer extends AppCompatTextView {
                  * Старт и стоп секундомера CHRONOMETER_TYPE_CONTINUOUS похож на таковой у CHRONOMETER_TYPE_ON_OFF
                  * Но при старте мы не корректируем m_aBase, и всё.
                  */
-                case CONTUINOUS:
+                case CONTINUOUS:
                     mStarted = true;
                     m_aHoldTime = 0;
                     dispatchEvent(Event.UNPAUSE);
@@ -454,7 +454,7 @@ public class PrecisionChronometer extends AppCompatTextView {
                     mHandler.sendMessageDelayed(Message.obtain(mHandler, DELAYED_HOLD_MESSAGE), mStopDelay);
                     break;
 
-                case CONTUINOUS:
+                case CONTINUOUS:
                     mStarted = false;
                     m_aHoldTime = SystemClock.elapsedRealtime();
                     dispatchEvent(Event.PAUSE);

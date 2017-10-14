@@ -1,18 +1,18 @@
 package ru.stage_sword.fafstopwatch;
 
 import android.annotation.SuppressLint;
-import android.support.annotation.IdRes;
-import android.support.annotation.StringRes;
-import android.support.v4.util.ArrayMap;
-import android.support.v7.app.ActionBar;
 import android.content.Context;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
 import android.support.transition.Scene;
 import android.support.transition.TransitionInflater;
 import android.support.transition.TransitionManager;
+import android.support.v4.util.ArrayMap;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -21,7 +21,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -274,12 +273,10 @@ public class StopwatchActivity extends AppCompatActivity
         }
     }
 
-    private void setDisciplineButtons(int checkedDiscipline) {
+    private void setDisciplineButtons() {
         RadioGroup buttons = findViewById(R.id.discipline_selector);
         buttons.setOnCheckedChangeListener(mDisciplineSelector);
-
-        if(checkedDiscipline != -1)
-            buttons.check(checkedDiscipline);
+        buttons.check(R.id.radio_Solo);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -375,10 +372,10 @@ public class StopwatchActivity extends AppCompatActivity
         mTotalTimerView.setTimeElapsed(totalTimeElapsed);
         mSpecialTimerView.setTimeElapsed(specialTimeElapsed);
 
-        setDisciplineButtons(R.id.radio_Solo);
+        setDisciplineButtons();
     }
 
-    public void activateTotalTimerView(View view) {
+    public void activateTotalTimerView() {
         mTransitionManager.transitionTo(mTotalTimerScene);
         mCurrentView = R.layout.total_timer_scene;
         show();
@@ -387,8 +384,8 @@ public class StopwatchActivity extends AppCompatActivity
         setTouchpadListeners();
     }
 
-    private void actualizeUIVisibility() { acrualize(false); }
-    private void acrualize(boolean immediately) {
+    private void actualizeUIVisibility() { actualizeUIVisibility(false); }
+    private void actualizeUIVisibility(boolean immediately) {
         if (!mVisible) {
             hide(immediately);
         } else {

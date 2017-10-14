@@ -3,7 +3,6 @@
     <dimen name="timer_text_size">80sp</dimen>
     <dimen name="time_title_textsize">20sp</dimen>
     <dimen name="time_title_padding">10sp</dimen>
-    <dimen name="total_timer_work_size">40sp</dimen>
     <dimen name="time_title_textsize_small">15sp</dimen>
     <dimen name="timer_text_size_small">20sp</dimen>
     <dimen name="time_title_padding_small">5sp</dimen>
