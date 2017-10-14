@@ -299,9 +299,7 @@ public class StopwatchActivity extends AppCompatActivity
 
     private void TotalTimerSetup() {
         mTotalTimerView = findViewById(R.id.total_timer_view);
-        mTotalTimerView
-                .setType(ON_OFF)
-                .resetBase();
+        mTotalTimerView.setType(ON_OFF);
     }
 
     private void SpecialTimerSetup() {
@@ -310,8 +308,7 @@ public class StopwatchActivity extends AppCompatActivity
                 .setType(ON_OFF_DELAYED)
                 .setStopDelayType(PrecisionChronometer.INCLUSIVE)
                 .setStopDelay(mSpecialTimerStopDelay)
-                .setOnChronometerHoldListener(this)
-                .resetBase();
+                .setOnChronometerHoldListener(this);
 
         mSpecialTimerBackgroundView = findViewById(R.id.special_timer_background);
     }

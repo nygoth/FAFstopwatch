@@ -545,7 +545,7 @@ public class PrecisionChronometer extends AppCompatTextView {
         mFrozen = false;
         long now = SystemClock.elapsedRealtime();
         long frozenInterval = now - m_aFreezeTime;    // Это тот интервал, на который должны быть скорректированы
-                                                                                // глобальные значения времени -- база, время останова
+                                                      // глобальные значения времени -- база, время останова
         long delayTimePassed = m_aFreezeTime - m_aHoldTime;
 
         // Если база больше, чем время заморозки, то, вероятно, её установили в тот момент, когда секундомер был заморожен
@@ -587,7 +587,7 @@ public class PrecisionChronometer extends AppCompatTextView {
         // будет возвращать всегда новое значение. Это неприемлимо, поэтому, если
         // при установке базы у нас секундомер не запущен, то ставим его на холд.
         mInitialised = true;
-        if(!mStarted)
+        if(!mStarted && !mOnHold && !mDelayed)
             mOnHold = true;
 
         return this;
@@ -624,9 +624,11 @@ public class PrecisionChronometer extends AppCompatTextView {
         long value = m_aHoldTime == 0 ? m_aBase : m_aHoldTime;
         boolean paused = !mStarted && mInitialised && !mOnHold;
 
-        return mStarted || mDelayed || paused ?
+        value =  mStarted || mDelayed || paused ?
                 (mFrozen ? m_aFreezeTime : SystemClock.elapsedRealtime()) :
                 value;
+
+        return value;
     }
 
     /*
