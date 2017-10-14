@@ -375,7 +375,7 @@ public class StopwatchActivity extends AppCompatActivity
         setDisciplineButtons();
     }
 
-    public void activateTotalTimerView() {
+    public void activateTotalTimerView(View view) {
         mTransitionManager.transitionTo(mTotalTimerScene);
         mCurrentView = R.layout.total_timer_scene;
         show();
