@@ -567,7 +567,7 @@ public class PrecisionChronometer extends AppCompatTextView {
         if(mStarted || mDelayed)
             updateRunning();
         else
-            updateText(m_aHoldTime);
+            updateText(m_aHoldTime != 0 ? m_aHoldTime : m_aBase);
     }
 
     public PrecisionChronometer setBase(long base) {
