@@ -220,7 +220,7 @@ public class PrecisionChronometer extends AppCompatTextView {
                     case TICK_MESSAGE:
                         holder.updateText(SystemClock.elapsedRealtime());
                         holder.dispatchTick();
-                        sendMessageDelayed(Message.obtain(this, TICK_MESSAGE), 97);
+                        sendMessageDelayed(Message.obtain(this, TICK_MESSAGE), 10);
                         break;
                     case DELAYED_HOLD_MESSAGE:
                         holder.hold();

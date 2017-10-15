@@ -1,8 +1,6 @@
 apply plugin: 'com.android.application'
 
 android {
-    signingConfigs {
-    }
     compileSdkVersion 26
     buildToolsVersion '26.0.1'
     defaultConfig {
@@ -17,6 +15,18 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    project.ext { appName = 'FAFStopwatch' }
+                    //def formattedDate = new Date().format('yyyyMMddHHmmss')
+                    def newName = output.outputFile.name
+                    newName = newName.replace("app-", "$project.ext.appName") //"MyAppName" -> I set my app variables in the root project
+                    //newName = newName.replace("-release", "-release" + formattedDate)
+                    newName = newName.replace("release", "")
+                    //noinspection GroovyAssignabilityCheck
+                    output.outputFile = new File(output.outputFile.parent, newName)
+                }
+            }
         }
     }
 }
