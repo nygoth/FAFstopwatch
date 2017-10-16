@@ -26,6 +26,10 @@
                 <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="ru.stage_sword.preferences.StopwatchPreferences"
+            android:label="@string/preferences_title"/>
     </application>
 
 </manifest>

@@ -11,4 +11,22 @@
     <string name="action_settings">Настройки</string>
     <string name="overrun_title">Перебор: %s сек</string>
     <string name="underrun_title">Недобор: %s сек</string>
+    <string name="preferences_title">Настройки</string>
+    <string name="preferences_total_title">Общие настройки</string>
+    <string name="preference_stop_delay_title">Задержка останова таймера фехтования</string>
+    <string name="preference_stop_delay_summary">%d сек.\n\nЗадержка в секундах между командой останова фехтовального секундомера и действительной остановкой оного.</string>
+    <string name="preference_strict_title">Строгое управление</string>
+    <string name="preference_strict_summary">Использовать ли для управления секундомером обычный тап одним пальцем, или двумя пальцами одновременно. Последнее уменьшает вероятность случайных нажатий</string>
+    <string name="preference_vibration_title">Вибрация</string>
+    <string name="preference_vibration_summary">Использовать ли вибрацию для информирования о прошедших командах управления секундомерами.</string>
+    <string name="preference_timing_screen_title">Временные интервалы дисциплин</string>
+    <string name="preference_total_category_title">Общее время выступления</string>
+    <string name="preference_total_summary">Общее время фехтования в этой дисциплине</string>
+    <string name="preference_fencing_category_title">Продолжительность фехтования</string>
+    <string name="preference_fencing_summary">Минимальное время фехтования в этой номинации</string>
+    <string name="preference_about_title">О программе</string>
+    <string name="preference_key_about_version">Версия %1$s</string>
+    <string name="preference_key_about_description">&#169; Сергей Дрянных (nygoth@gmail.com), 2017</string>
+    <string name="timepicker_minutes_title">Минуты:</string>
+    <string name="timepicker_seconds_title">Секунды:</string>
 </resources>

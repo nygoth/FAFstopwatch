@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory
+        android:key="main"
+        android:title="@string/preferences_total_title">
+
+        <ru.stage_sword.preferences.NumberPickerPreference
+            android:title="@string/preference_stop_delay_title"
+            android:key="stop_delay"
+            android:defaultValue="10"
+            app:minValue="@integer/fencing_timer_min_delay"
+            app:maxValue="@integer/fencing_timer_max_delay"
+            app:wrapSelectorWheel="false"
+            android:summary="@string/preference_stop_delay_summary"/>
+
+        <CheckBoxPreference
+            android:title="@string/preference_strict_title"
+            android:key="strict_control"
+            android:defaultValue="false"
+            android:summary="@string/preference_strict_summary"/>
+
+        <CheckBoxPreference
+            android:title="@string/preference_vibration_title"
+            android:summary="@string/preference_vibration_summary"
+            android:defaultValue="true"
+            android:key="vibration"/>
+
+        <PreferenceScreen
+            android:key="timing_screen"
+            android:title="@string/preference_timing_screen_title">
+
+            <PreferenceCategory
+                android:key="total_duration_category"
+                android:title="@string/preference_total_category_title">
+
+                <ru.stage_sword.preferences.TimePreference
+                    android:defaultValue="120"
+                    android:key="total_solo"
+                    app:maxMinutes="10"
+                    android:title="@string/solo_label"/>
+
+                <ru.stage_sword.preferences.TimePreference
+                    android:defaultValue="150"
+                    android:key="total_synchro"
+                    app:maxMinutes="10"
+                    android:title="@string/synchron_label"/>
+
+                <ru.stage_sword.preferences.TimePreference
+                    android:defaultValue="240"
+                    android:key="total_duet"
+                    app:maxMinutes="10"
+                    android:title="@string/duet_label"/>
+
+                <ru.stage_sword.preferences.TimePreference
+                    android:defaultValue="360"
+                    android:key="total_group"
+                    app:maxMinutes="10"
+                    android:title="@string/group_label"/>
+            </PreferenceCategory>
+
+            <PreferenceCategory
+                android:key="fencing_duration_category"
+                android:title="@string/preference_fencing_category_title">
+
+                <ru.stage_sword.preferences.TimePreference
+                    android:defaultValue="80"
+                    android:key="fencing_solo"
+                    app:maxMinutes="10"
+                    android:title="@string/solo_label"/>
+
+                <ru.stage_sword.preferences.TimePreference
+                    android:defaultValue="120"
+                    android:key="fencing_synchro"
+                    app:maxMinutes="10"
+                    android:title="@string/synchron_label"/>
+
+                <ru.stage_sword.preferences.TimePreference
+                    android:defaultValue="120"
+                    android:key="fencing_duet"
+                    app:maxMinutes="10"
+                    android:title="@string/duet_label"/>
+
+                <ru.stage_sword.preferences.TimePreference
+                    android:defaultValue="210"
+                    android:key="fencing_group"
+                    app:maxMinutes="10"
+                    android:title="@string/group_label"/>
+            </PreferenceCategory>
+
+        </PreferenceScreen>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/preference_about_title"
+        android:key="about">
+
+        <Preference
+            android:key="about_text"
+            android:selectable="false"
+            android:title="@string/preference_key_about_version"
+            android:summary="@string/preference_key_about_description"/>
+
+    </PreferenceCategory>
+</PreferenceScreen>

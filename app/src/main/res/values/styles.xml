@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -38,4 +38,16 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
+    <style name="TimePickerValueLarge" parent="TextAppearance.AppCompat.Large">
+        <item name="android:padding">@dimen/time_title_padding</item>
+        <item name="android:textSize">@dimen/timer_text_size_mid</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="DividerHorizontal">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">2dp</item>
+        <item name="android:background">?android:attr/listDivider</item>
+        <item name="android:layout_margin">4dp</item>
+    </style>
 </resources>

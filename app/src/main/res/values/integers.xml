@@ -10,4 +10,6 @@
     <integer name="group_discipline_fencing_duration">21000</integer>
     <integer name="duet_discipline_fencing_duration">12000</integer>
     <integer name="synchro_discipline_fencing_duration">12000</integer>
+    <integer name="fencing_timer_min_delay">0</integer>
+    <integer name="fencing_timer_max_delay">20</integer>
 </resources>
