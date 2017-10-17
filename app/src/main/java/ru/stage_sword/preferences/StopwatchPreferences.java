@@ -31,6 +31,9 @@ public class StopwatchPreferences extends PreferenceActivity {
             } catch (PackageManager.NameNotFoundException e) {}
 
             findPreference("about_text").setTitle(about);
+
+            //FIXME enable after corresponding code writing
+            findPreference(P.STRICT_CONTROL).setEnabled(false);
         }
     }
 

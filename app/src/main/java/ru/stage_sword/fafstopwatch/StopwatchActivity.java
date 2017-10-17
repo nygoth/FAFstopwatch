@@ -3,10 +3,12 @@ package ru.stage_sword.fafstopwatch;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
 import android.support.transition.Scene;
@@ -25,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import ru.stage_sword.preferences.P;
 import ru.stage_sword.preferences.StopwatchPreferences;
 
 import static ru.stage_sword.fafstopwatch.PrecisionChronometer.DELAYED;
@@ -35,6 +38,7 @@ import static ru.stage_sword.fafstopwatch.PrecisionChronometer.UNKNOWN_STATE;
 public class StopwatchActivity extends AppCompatActivity
         implements  View.OnClickListener,
                     View.OnLongClickListener,
+                    SharedPreferences.OnSharedPreferenceChangeListener,
                     PrecisionChronometer.OnChronometerHoldListener {
     @SuppressWarnings("unused")
     private static final String TAG = "FAF";
@@ -162,6 +166,16 @@ public class StopwatchActivity extends AppCompatActivity
     private boolean mNotifyVibrate;
     private ArrayMap<Integer, Integer> mDisciplineTotalDuration = new ArrayMap<>();
     private ArrayMap<Integer, Integer> mDisciplineFencingDuration = new ArrayMap<>();
+    private int mDefault_StopDelay;
+    private int mDefault_TotalSolo;
+    private int mDefault_TotalGroup;
+    private int mDefault_TotalDuet;
+    private int mDefault_TotalSynchro;
+    private int mDefault_FencingSolo;
+    private int mDefault_FencingGroup;
+    private int mDefault_FencingDuet;
+    private int mDefault_FencingSynchro;
+    private boolean mStrictControl;
 
     //    @Override
 //    public void onConfigurationChanged(Configuration newConfig) {
@@ -188,7 +202,6 @@ public class StopwatchActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_stopwatch);
 
-        mNotifyVibrate = true;
         mVisible = true;
         if (savedInstanceState != null) {
             mVisible     = savedInstanceState.getBoolean(UI_VISIBLE_STATE, true);
@@ -211,28 +224,54 @@ public class StopwatchActivity extends AppCompatActivity
 
         mAnimationDuration = getResources().getInteger(R.integer.timer_animation_duration);
 
-        /*
-         * Величины, определяющие временные нормативы конкретных дисциплин
-         */
-        // Интервал, который идёт в зачёт фехтовальной практики после её окончания
-        mSpecialTimerStopDelay = getResources().getInteger(R.integer.special_timer_default_stop_delay);
-
-        // Общая продолжительность выступления в соответствующих дисциплинах. В миллисекундах
-        mDisciplineTotalDuration.put(SOLO,    getResources().getInteger(R.integer.solo_discipline_total_duration));
-        mDisciplineTotalDuration.put(GROUP,   getResources().getInteger(R.integer.group_discipline_total_duration));
-        mDisciplineTotalDuration.put(DUET,    getResources().getInteger(R.integer.duet_discipline_total_duration));
-        mDisciplineTotalDuration.put(SYNCHRO, getResources().getInteger(R.integer.synchro_discipline_total_duration));
-
-        mDisciplineFencingDuration.put(SOLO,    getResources().getInteger(R.integer.solo_discipline_fencing_duration));
-        mDisciplineFencingDuration.put(GROUP,   getResources().getInteger(R.integer.group_discipline_fencing_duration));
-        mDisciplineFencingDuration.put(DUET,    getResources().getInteger(R.integer.duet_discipline_fencing_duration));
-        mDisciplineFencingDuration.put(SYNCHRO, getResources().getInteger(R.integer.synchro_discipline_fencing_duration));
+        obtainDefaults();
+        loadPreferences();
 
         mTouchpad = findViewById(R.id.touchpad);
         if(mCurrentView == R.layout.final_results_scene)
             ((RadioGroup) findViewById(R.id.discipline_selector)).setOnCheckedChangeListener(mDisciplineSelector);
 
         actualizeUIVisibility();
+    }
+
+    /*
+     * Установка значений по умолчанию для конфигурационных переменных
+     */
+    private void obtainDefaults() {
+        // Интервал, который идёт в зачёт фехтовальной практики после её окончания
+        mDefault_StopDelay = getResources().getInteger(R.integer.special_timer_default_stop_delay);
+
+        // Общая продолжительность выступления в соответствующих дисциплинах. В миллисекундах
+        mDefault_TotalSolo    = getResources().getInteger(R.integer.solo_discipline_total_duration);
+        mDefault_TotalGroup   = getResources().getInteger(R.integer.group_discipline_total_duration);
+        mDefault_TotalDuet    = getResources().getInteger(R.integer.duet_discipline_total_duration);
+        mDefault_TotalSynchro = getResources().getInteger(R.integer.synchro_discipline_total_duration);
+
+        mDefault_FencingSolo    = getResources().getInteger(R.integer.solo_discipline_fencing_duration);
+        mDefault_FencingGroup   = getResources().getInteger(R.integer.group_discipline_fencing_duration);
+        mDefault_FencingDuet    = getResources().getInteger(R.integer.duet_discipline_fencing_duration);
+        mDefault_FencingSynchro = getResources().getInteger(R.integer.synchro_discipline_fencing_duration);
+    }
+
+    /*
+     * Величины, определяющие временные нормативы конкретных дисциплин
+     */
+    private void loadPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        mSpecialTimerStopDelay = sharedPreferences.getInt(P.STOP_DELAY, mDefault_StopDelay) * 1000;
+        mStrictControl         = sharedPreferences.getBoolean(P.STRICT_CONTROL, false);
+        mNotifyVibrate         = sharedPreferences.getBoolean(P.VIBRATION, true);
+
+        mDisciplineTotalDuration.put(SOLO,    sharedPreferences.getInt(P.TOTAL_SOLO,    mDefault_TotalSolo)    * 100);
+        mDisciplineTotalDuration.put(SYNCHRO, sharedPreferences.getInt(P.TOTAL_SYNCHRO, mDefault_TotalSynchro) * 100);
+        mDisciplineTotalDuration.put(DUET,    sharedPreferences.getInt(P.TOTAL_DUET,    mDefault_TotalDuet)    * 100);
+        mDisciplineTotalDuration.put(GROUP,   sharedPreferences.getInt(P.TOTAL_GROUP,   mDefault_TotalGroup)   * 100);
+
+        mDisciplineFencingDuration.put(SOLO,    sharedPreferences.getInt(P.FENCING_SOLO,    mDefault_FencingSolo)    * 100);
+        mDisciplineFencingDuration.put(SYNCHRO, sharedPreferences.getInt(P.FENCING_SYNCHRO, mDefault_FencingSynchro) * 100);
+        mDisciplineFencingDuration.put(DUET,    sharedPreferences.getInt(P.FENCING_DUET,    mDefault_FencingDuet)    * 100);
+        mDisciplineFencingDuration.put(GROUP,   sharedPreferences.getInt(P.FENCING_GROUP,   mDefault_FencingGroup)   * 100);
     }
 
     @Override
@@ -476,5 +515,50 @@ public class StopwatchActivity extends AppCompatActivity
 
     public void ShowSettings(MenuItem item) {
         startActivity(new Intent(this, StopwatchPreferences.class));
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        switch (key) {
+            case P.STOP_DELAY:
+                mSpecialTimerStopDelay = sharedPreferences.getInt(P.STOP_DELAY, mDefault_StopDelay) * 1000;
+                break;
+            case P.STRICT_CONTROL:
+                mStrictControl = sharedPreferences.getBoolean(P.STRICT_CONTROL, false);
+                break;
+            case P.VIBRATION:
+                mNotifyVibrate = sharedPreferences.getBoolean(P.VIBRATION, true);
+                break;
+
+            /*
+             * Настройки времени даны в секундах. Но мы умножаем их не на 1000 (чтобы получит милисекунды), а на 100
+             * Это позволит при контроле интервалов не влетать в ошибки округления, так как мы считаем секундомером
+             * не тысячные, а сотые секунды.
+             */
+            case P.TOTAL_SOLO:
+                mDisciplineTotalDuration.put(SOLO, sharedPreferences.getInt(P.TOTAL_SOLO, mDefault_TotalSolo) * 100);
+                break;
+            case P.TOTAL_SYNCHRO:
+                mDisciplineTotalDuration.put(SYNCHRO, sharedPreferences.getInt(P.TOTAL_SYNCHRO, mDefault_TotalSynchro) * 100);
+                break;
+            case P.TOTAL_DUET:
+                mDisciplineTotalDuration.put(DUET, sharedPreferences.getInt(P.TOTAL_DUET, mDefault_TotalDuet) * 100);
+                break;
+            case P.TOTAL_GROUP:
+                mDisciplineTotalDuration.put(GROUP, sharedPreferences.getInt(P.TOTAL_GROUP, mDefault_TotalGroup) * 100);
+                break;
+            case P.FENCING_SOLO:
+                mDisciplineFencingDuration.put(SOLO, sharedPreferences.getInt(P.FENCING_SOLO, mDefault_FencingSolo) * 100);
+                break;
+            case P.FENCING_SYNCHRO:
+                mDisciplineFencingDuration.put(SYNCHRO, sharedPreferences.getInt(P.FENCING_SYNCHRO, mDefault_FencingSynchro) * 100);
+                break;
+            case P.FENCING_DUET:
+                mDisciplineFencingDuration.put(DUET, sharedPreferences.getInt(P.FENCING_DUET, mDefault_FencingDuet) * 100);
+                break;
+            case P.FENCING_GROUP:
+                mDisciplineFencingDuration.put(GROUP, sharedPreferences.getInt(P.FENCING_GROUP, mDefault_FencingGroup) * 100);
+                break;
+        }
     }
 }

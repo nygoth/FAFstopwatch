@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="timer_animation_duration">200</integer>
-    <integer name="special_timer_default_stop_delay">10000</integer>
-    <integer name="solo_discipline_total_duration">12000</integer>
-    <integer name="group_discipline_total_duration">36000</integer>
-    <integer name="duet_discipline_total_duration">24000</integer>
-    <integer name="synchro_discipline_total_duration">15000</integer>
-    <integer name="solo_discipline_fencing_duration">8000</integer>
-    <integer name="group_discipline_fencing_duration">21000</integer>
-    <integer name="duet_discipline_fencing_duration">12000</integer>
-    <integer name="synchro_discipline_fencing_duration">12000</integer>
+    <integer name="special_timer_default_stop_delay">10</integer>
+    <integer name="solo_discipline_total_duration">120</integer>
+    <integer name="group_discipline_total_duration">360</integer>
+    <integer name="duet_discipline_total_duration">240</integer>
+    <integer name="synchro_discipline_total_duration">150</integer>
+    <integer name="solo_discipline_fencing_duration">80</integer>
+    <integer name="group_discipline_fencing_duration">210</integer>
+    <integer name="duet_discipline_fencing_duration">120</integer>
+    <integer name="synchro_discipline_fencing_duration">120</integer>
     <integer name="fencing_timer_min_delay">0</integer>
     <integer name="fencing_timer_max_delay">20</integer>
 </resources>
